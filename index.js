@@ -1,24 +1,26 @@
-import Koa from 'koa';
-import Router from 'koa-router';
-import IO from 'koa-socket';
-import send from 'koa-send';
-import serve from 'koa-static';
-import config from './config';
-import passport from 'koa-passport';
-import FacebookStrategy from 'passport-facebook'
-import session from 'koa-session';
-import bodyParser from 'koa-bodyparser';
-
+const Koa = require('koa');
+const Router = require('koa-router');
+const IO = require('koa-socket');
+// import send from 'koa-send';
+const serve = require('koa-static');
+const logger = require('koa-logger');
+const config = require('./config').config;
+const passport = require('koa-passport');
+const FacebookStrategy = require('passport-facebook');
+const session = require('koa-session');
+// import bodyParser from 'koa-bodyparser';
+const fs = require("fs");
 const app = new Koa();
 const io = new IO();
 // const io = new IO("3000",{parser: parser});
 const router = new Router();
 
+const port = process.env.port || process.env.PORT || config.server.port;
 
 app.keys = [config.server.sessionKey];
-app.use(bodyParser());
+// app.use(bodyParser());
 app.use(serve('static'));
-
+app.use(logger());
 app.use(session({}, app));
 
 
@@ -35,7 +37,7 @@ passport.deserializeUser(async function (user, done) {
 passport.use(new FacebookStrategy({
         clientID: config.auth.facebook.clientID,
         clientSecret: config.auth.facebook.clientSecret,
-        callbackURL: `http://${config.server.domen}:${config.server.port}/auth/facebook/callback`,
+        callbackURL: `http://${config.server.domen}:${port}/auth/facebook/callback`,
         profileFields: ['id', 'displayName', 'photos', 'email', 'link']
     },
     function(accessToken, refreshToken, profile, cb) {
@@ -60,7 +62,9 @@ router
         if(ctx.isAuthenticated()){
             ctx.redirect('/chat');
         } else {
-            await send(ctx, './templete/index.html');
+            // await send(ctx, './templete/index.html');
+            ctx.type = "html";
+            ctx.body = fs.readFileSync('./templete/index.html');
         }
     })
 
@@ -86,10 +90,9 @@ router
     .get('/chat', async(ctx) => {
         if(ctx.isAuthenticated()){
             let user = ctx.state.user;
-            // let photo = user && user.photos && user.photos[0] && user.photos[0].value;
-            // let name = user && user.displayName || "not name";
-            // ctx.body = `<h1 style='font-size: 8vh;margin-top:30vh;text-align:center'> <img src="${photo}" alt=""> ${name}</h1>`;
-            await send(ctx, './templete/chat.html');
+            // await send(ctx, './templete/chat.html');
+            ctx.type = "html";
+            ctx.body = fs.readFileSync('./templete/chat.html');
         } else {
             ctx.redirect('/');
         }
@@ -109,7 +112,9 @@ router
     })
 
     .get('/register', async (ctx) => {
-        await send(ctx, './register.html');
+        // await send(ctx, './register.html');
+        ctx.type = "html";
+        ctx.body = fs.readFileSync('./templete/register.html');
     });
 
 app.use(async function (ctx, next) {
@@ -185,4 +190,4 @@ io.on('add user', (ctx, userData) => {
 });
 
 
-app.listen(3000, `${config.server.domen}`,);
+app.listen(port, () => console.log(`server start: ${port}`) );

@@ -1,4 +1,4 @@
-export default {
+module.exports.config = {
     server : {
         domen : "localhost",
         // domen : "10.10.60.130",
