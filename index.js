@@ -8,7 +8,7 @@ const config = require('./config').config;
 const passport = require('koa-passport');
 const FacebookStrategy = require('passport-facebook');
 const session = require('koa-session');
-// import bodyParser from 'koa-bodyparser';
+const bodyParser = require('koa-bodyparser');
 const fs = require("fs");
 const app = new Koa();
 const io = new IO();
@@ -18,7 +18,7 @@ const router = new Router();
 const port = process.env.port || process.env.PORT || config.server.port;
 
 app.keys = [config.server.sessionKey];
-// app.use(bodyParser());
+app.use(bodyParser());
 app.use(serve('static'));
 app.use(logger());
 app.use(session({}, app));
@@ -37,11 +37,13 @@ passport.deserializeUser(async function (user, done) {
 passport.use(new FacebookStrategy({
         clientID: config.auth.facebook.clientID,
         clientSecret: config.auth.facebook.clientSecret,
-        callbackURL: `http://${config.server.domen}:${port}/auth/facebook/callback`,
+        // callbackURL: `http://${config.server.domen}:${port}/auth/facebook/callback`,
+        // callbackURL: `${config.server.domen}:${port}/auth/facebook/callback`,
+        callbackURL: `https://${config.server.domen}/auth/facebook/callback`,
         profileFields: ['id', 'displayName', 'photos', 'email', 'link']
     },
     function(accessToken, refreshToken, profile, cb) {
-    console.log(profile);
+        console.log(profile);
         return cb(null, profile);
         // User.findOrCreate({ facebookId: profile.id }, function (err, user) {
         //     return cb(err, user);
@@ -88,6 +90,7 @@ router
     })
 
     .get('/chat', async(ctx) => {
+        console.log("---\n", ctx.isAuthenticated(),"---\n", ctx, "\n---")
         if(ctx.isAuthenticated()){
             let user = ctx.state.user;
             // await send(ctx, './templete/chat.html');

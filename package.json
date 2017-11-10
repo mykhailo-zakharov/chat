@@ -2,12 +2,14 @@
   "name": "koa-test",
   "version": "1.0.0",
   "description": "Test koa2 backend",
+  "engines": {
+    "node": "8.x"
+  },
   "main": "index.js",
-  "author": "SWalker",
+  "author": "",
   "license": "MIT",
   "scripts": {
-//    "start": "nodemon index --exec babel-node",
-    "start": "node index",
+    "start": "node index.js",
     "clear": "lsof -i TCP:3000 | grep LISTEN | awk '{print $2}' | xargs kill -9",
     "build": "webpack"
   },

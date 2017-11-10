@@ -27,7 +27,8 @@ export default class Chat extends Component {
             countPeople: 0
         };
 
-        this.socket = io('http://localhost:3000');
+        // this.socket = io('http://localhost:3000');
+        this.socket = io(window.location.origin);
         this.socket.on("connect", () => this.getUserData() );
     }
 

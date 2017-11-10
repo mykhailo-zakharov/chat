@@ -1,7 +1,8 @@
 module.exports.config = {
     server : {
-        domen : "localhost",
-        // domen : "10.10.60.130",
+        // domen : "localhost",
+        // domen : "chat-hell.herokuapp.com",
+        domen : "sheltered-chamber-39570.herokuapp.com",
         port : 3000,
         sessionKey : 'your-session-secret'
     },
