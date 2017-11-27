@@ -31,5 +31,10 @@ module.exports = {
     },
     plugins: [
         new ExtractTextPlugin("bundle.css")
-    ]
+    ],
+    devServer: {
+        contentBase: path.join(__dirname, "templete"),
+        compress: true,
+        port: 9000
+    }
 };
